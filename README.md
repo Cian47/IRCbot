@@ -1,2 +1,2 @@
 # IRCbot
-Simple unstructured IRC bot
+Simple unstructured IRC bot... just to see how it's working. Getting more modular, clean and structed in the future...

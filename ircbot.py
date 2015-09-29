@@ -36,7 +36,7 @@ class IRCbot(object):
             print "===\nRECV\n===\n",recv
             if recv.find("PING :") != -1: # if the server pings us then we've got to respond!
                 print "pingpong"
-                pong()
+                self.pong()
             
                 
                 

@@ -67,20 +67,7 @@ def msgs():
         for d in data:
             ircsock.send("PRIVMSG "+ channel +" :"+d)
             
-            
-
-def google():
-    var=0
-    while 1:
-        link="https://plus.google.com/+KevinFreeman47/posts"
-        res=urllib2.urlopen(link)
-        res=res.read().strip('\n\r')
-        w=res.split('herungswerte)">')[1].split("</span>")[0]
-        wait=random.randint(10,25)
-        print "opened",var,"got:",w,"wait",wait
-        var+=1
-        time.sleep(wait)
-        
+                    
    
        
                   
@@ -227,6 +214,5 @@ while 1: # Be careful with these! it might send you to an infinite loop
                 time.sleep(20)
                 thread.start_new_thread(bullshit,())
                 thread.start_new_thread(msgs,())
-                thread.start_new_thread(google,())
         except IndexError:
             pass

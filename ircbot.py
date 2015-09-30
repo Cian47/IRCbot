@@ -52,7 +52,7 @@ class IRCbot(object):
                 if recv.split(":")[0]=="PING ":
                     print "pingpong"
                     self.pong()
-                else if len(recv)<300: #tmp for now, there are bigger packets at session start...
+                elif len(recv)<300: #tmp for now, there are bigger packets at session start...
                     try:
                         _, msg_header, msg_payload = recv.split(":",2)
                         identification, msg_type, msg_receiver = msg_header.strip(" ").split(" ")

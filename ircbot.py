@@ -5,7 +5,6 @@ import thread
 import time
 import threading 
 
-import mods.hello
 
 class IRCbot(object):
                     
@@ -46,15 +45,26 @@ class IRCbot(object):
         self.sock.send("PONG :pingis\n")  
             
     def recv(self):
-        some_queue=[]
-        ## module starting here ##
-        test_mod = mods.hello.hello()
-        thread.start_new_thread(test_mod.run,(some_queue,)) 
+        if self.args.hello:
+            exec "import mods.hello"
+            mod_queue=[]
+            ## module starting here ##
+            some_queue=[]
+            mod_queue.append(some_queue)
+            test_mod = mods.hello.hello()
+            thread.start_new_thread(test_mod.run,(some_queue,))
+            
+            
+            ## module starting here ##
+            some_queue=[]
+            mod_queue.append(some_queue)
+            test_mod2 = mods.hello.hello()
+            thread.start_new_thread(test_mod2.run,(some_queue,)) 
         
         while True:
             recv = self.sock.recv(2048).strip('\n\r')
             if len(recv)!=0:
-                print "SOME QUEUE:::::::",some_queue
+                print "MOD QUEUE :::::::",mod_queue
                 print "===\nRECV %d\n==="%len(recv)
                 
                 if recv.split(":")[0]=="PING ":
@@ -69,6 +79,9 @@ class IRCbot(object):
                                          
                         if msg_payload=="!time":
                             test_mod.cmd(str(time.time()))
+                            
+                        if msg_payload=="!tim":
+                            test_mod2.cmd("test...")
                             
                             
                         print recv.split(":",2)

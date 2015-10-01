@@ -3,8 +3,7 @@ import thread
 
 #tmp
 import time
-import threading 
-
+import sys
 
 class IRCbot(object):
                     
@@ -12,8 +11,8 @@ class IRCbot(object):
         self.args=args
         self.server="irc.underworld.no"
         self.port=6667
-        self.nick="Abbot"
-        self.channel="#birc"
+        self.nick="Botler"
+        self.channel="#testenv"
         #self.ircPassword
         #self.SSL=
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -34,6 +33,10 @@ class IRCbot(object):
         print "Joining Channel %s"%chan
         self.sock.send("JOIN "+ chan +"\n")
         
+    def leaveChannel(self, chan):
+        print "Joining Channel %s"%chan
+        self.sock.send("LEAVE "+ chan +"\n")
+        
     def message(self, to, msg):
         self.sock.send("PRIVMSG "+ to +" :"+msg+"\n")
         
@@ -45,26 +48,23 @@ class IRCbot(object):
         self.sock.send("PONG :pingis\n")  
             
     def recv(self):
-        if self.args.hello:
-            exec "import mods.hello"
-            mod_queue=[]
+        running_mods=[]
+        mods=["hello","hello"]
+        for m in mods:
+            exec "import mods.%s"%m
             ## module starting here ##
-            some_queue=[]
-            mod_queue.append(some_queue)
-            test_mod = mods.hello.hello()
-            thread.start_new_thread(test_mod.run,(some_queue,))
+            exec "mod=mods.%s.%s()"%(m,m)
+            running_mods.append(mod)
+            thread.start_new_thread(self.modHandling,(mod,))
+            
+        #needed threads
+        thread.start_new_thread(self.ownSend,())
             
             
-            ## module starting here ##
-            some_queue=[]
-            mod_queue.append(some_queue)
-            test_mod2 = mods.hello.hello()
-            thread.start_new_thread(test_mod2.run,(some_queue,)) 
         
         while True:
             recv = self.sock.recv(2048).strip('\n\r')
             if len(recv)!=0:
-                print "MOD QUEUE :::::::",mod_queue
                 print "===\nRECV %d\n==="%len(recv)
                 
                 if recv.split(":")[0]=="PING ":
@@ -76,12 +76,9 @@ class IRCbot(object):
                         _, msg_header, msg_payload = recv.split(":",2)
                         identification, msg_type, msg_receiver = msg_header.strip(" ").split(" ")
                         sender=identification.split("!")
-                                         
-                        if msg_payload=="!time":
-                            test_mod.cmd(str(time.time()))
-                            
-                        if msg_payload=="!tim":
-                            test_mod2.cmd("test...")
+                        
+                        for mod in running_mods:
+                            mod.cmd(msg_payload)
                             
                             
                         print recv.split(":",2)
@@ -99,5 +96,17 @@ class IRCbot(object):
                 print "disconnect ???"
                 input(" ... ")
                 
-                
+    def modHandling(self,mod):
+        while 1:
+            send=mod.queue_out.get()
+            print "SENDING: %s"%send
+            self.sock.send(send)
+        
+    def ownSend(self):
+        while 1:
+            print "ENTER MSG NOW:"
+            data = sys.stdin.readlines()
+            for d in data:
+                self.sock.send(d)
+        
     

@@ -1,18 +1,24 @@
 import socket
 import thread
 
-#tmp
-import time
-import sys
+#mystuff
+from channel import *
 
-class IRCbot(object):
-                    
+import time  # schedule msg output
+import sys  # read input for ownSend
+
+#FINAL VARIABLES:
+TOPIC="332"
+USERLIST="353"
+EOFNAMES="366"
+
+class IRCbot(object):         
     def __init__(self, args):
         self.args=args
         self.server="irc.underworld.no"
         self.port=6667
         self.nick="Botler"
-        self.channel="#testenv"
+        self.channels={}
         #self.ircPassword
         #self.SSL=
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -27,10 +33,16 @@ class IRCbot(object):
             print "Connecting to %s:%d"%(self.server,self.port)
         self.sock.send("USER "+ self.nick +" "+ self.nick +"_ "+ self.nick +"__ :"+self.nick+"\n") # user authentication
         self.sock.send("NICK "+ self.nick +"\n") # here we actually assign the nick to the bot
-        self.joinChannel(self.channel)
+        chans=["#bottle123","#bottle3789"]
+        for c in chans:
+            self.joinChannel(c)
         
     def joinChannel(self, chan):
-        print "Joining Channel %s"%chan
+        if self.args.verbose:
+            print "Joining Channel %s"%chan
+        self.channels[chan]=Channel(chan)
+        print "CREATED CHANNEL OBJECT"
+        print self.channels
         self.sock.send("JOIN "+ chan +"\n")
         
     def leaveChannel(self, chan):
@@ -49,7 +61,7 @@ class IRCbot(object):
             
     def recv(self):
         running_mods=[]
-        mods=["hello","hello"]
+        mods=["pong"]
         for m in mods:
             exec "import mods.%s"%m
             ## module starting here ##
@@ -68,39 +80,56 @@ class IRCbot(object):
                 print "===\nRECV %d\n==="%len(recv)
                 
                 if recv.split(":")[0]=="PING ":
-                    print "pingpong"
                     self.pong()
-                elif len(recv)<512: #tmp for now, there are bigger packets at session start...
+                elif len(recv.split("\n"))==1:  # single msg = single line ;)
                     print recv
-                    try:
-                        _, msg_header, msg_payload = recv.split(":",2)
-                        identification, msg_type, msg_receiver = msg_header.strip(" ").split(" ")
-                        sender=identification.split("!")
-                        
-                        for mod in running_mods:
-                            mod.cmd(msg_payload)
+                    for mod in running_mods:
+                        mod.cmd(recv)
+                else:
+                    for l in recv.split("\n"):
+                        l=l.strip("\r")
+                        cols=l.split(":")
+                        if len(cols)>1:  # there has to be a ':', otherwise we dont care
+                            if cols[0]=="NOTICE AUTH ":
+                                pass
+                            #print l
+                            content=cols[1].split(" ")
+                            if content[0]==self.server and len(content)>1:  # it's a server msg and has -more- content
+                                msg_type = content[1]
+                                if msg_type==TOPIC:
+                                    try:
+                                        self.channels[content[3]].topic=cols[2]
+                                    except KeyError:
+                                        print "ERROR. TOPIC OF %s BUT NO CHANNELOBJECT!"%(content[4])
+                                    pass
+                                elif msg_type==EOFNAMES:
+                                    pass
+                                elif msg_type==USERLIST:
+                                    try:
+                                        self.channels[content[4]].users=cols[2].strip(" ").split(" ")
+                                    except KeyError:
+                                        print "ERROR. USERLIST OF %s BUT NO CHANNELOBJECT!"%(content[4])
+                                    pass
+                                elif self.args.verbose:
+                                    print "UNKOWN MSG_TYPE %s @ %s"%(msg_type,cols)
                             
-                            
-                        print recv.split(":",2)
-                        print msg_header.split(" ") 
-                        print "sender: ",sender
-                    except IndexError:
-                        if self.args.verbose:
-                            print "IndexError"
-                        pass
-                    except ValueError: # no normal channel/private message
-                        if self.args.verbose:
-                            print "ValueError"
-                        pass
             else:
                 print "disconnect ???"
                 input(" ... ")
                 
     def modHandling(self,mod):
+        sent = 0
+        lastsent = time.time()
         while 1:
             send=mod.queue_out.get()
-            print "SENDING: %s"%send
+            if time.time()-lastsent>10:
+                sent = 0
+            print "SENDING: \n=> '%s'"%send
             self.sock.send(send)
+            lastsent=time.time()
+            sent += 1
+            if sent >= 5:
+                time.sleep(1)
         
     def ownSend(self):
         while 1:

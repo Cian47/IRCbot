@@ -1,11 +1,14 @@
 import thread
 from Queue import *
+import time
 
 class pong(object):
     def __init__(self):
         self.queue_in=Queue()
         self.queue_out=Queue()
         thread.start_new_thread(self.run,())
+        self.resttime=0
+        self.lastcmd=0
     
     def run(self):
         while 1:
@@ -17,6 +20,7 @@ class pong(object):
                 
                 if msg_payload[0]=="\x01" and msg_payload[1:6]=="PING ":
                     self.queue_out.put("NOTICE %s :%s\n"%(sender[0],msg_payload))
+                    self.lastcmd=time.time()
                 
             except IndexError:
                 print "IndexError"

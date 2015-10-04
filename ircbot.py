@@ -18,7 +18,7 @@ class IRCbot(object):
         self.args=args
         self.server="irc.underworld.no"
         self.port=6667
-        self.nick="Abb0to"
+        self.nick="Abb0t"
         self.channels={}
         #self.ircPassword
         #self.SSL=
@@ -65,7 +65,7 @@ class IRCbot(object):
             
     def recv(self):
         running_mods=[]
-        mods=["pong","mensa"]
+        mods=["pong","mensa","op"]
         for m in mods:
             exec "import mods.%s"%m
             ## module starting here ##

@@ -46,16 +46,16 @@ class mensa(object):
                     self.lastcmd=time.time()
                     day = msg_payload.split(" ")[1].lower()
                     if day == "sunday":
-                        self.queue_out.put("PRIVMSG "+ msg_receiver +" :sunday? are you serious?!\n")
+                        self.queue_out.put("PRIVMSG "+ msg_receiver +" :\x02\x1Fsunday\x0F? are you serious?!\n")
                     elif day in days:
                         push = 0
                         day_index = days.index(msg_payload.split(" ")[1].lower())
                         if msg_payload.split(" ")[1].lower()=="week":
                             push = 1
                             day_index = 7
-                            self.queue_out.put("PRIVMSG "+ msg_receiver +" :===Next weeks menu===\n")
+                            self.queue_out.put("PRIVMSG "+ msg_receiver +" :\x02\x1F===Next weeks menu===\n")
                         else:
-                            self.queue_out.put("PRIVMSG "+ msg_receiver +" :%ss menu:\n"%day)
+                            self.queue_out.put("PRIVMSG "+ msg_receiver +" :\x02\x1F%ss menu:\n"%day)
                         link="http://www.studentenwerk-goettingen.de/speiseplan.html?selectmensa=Nordmensa&push=%d&day=%d"%(push,day_index)
                         content=urllib2.urlopen(link).read().strip('\n\r')
                         ddays=content.split('speise-tblhead')
@@ -79,13 +79,31 @@ class mensa(object):
 
     def to_out(self, content, msg_receiver):
         app=content.split('<td class="ext_sits_speiseplan_rechts"><span class="ext_sits_essen">')
+        dishes=[]
+        fruits=[]
         if len(app)>1:
             for i in range(1,len(app)):
                 if len(app[i].split("<strong>")[1].split("</strong>")[0]):
                     mens=self.h.unescape(app[i].split("<strong>")[1].split("</strong>")[0])
                     mens=''.join(mens.encode('utf-8'))
                     #print mens
-                    self.queue_out.put("PRIVMSG "+ msg_receiver +" :  - "+str(re.sub("\(.*\)","",mens))+"\n")
+                    self.queue_out.put("PRIVMSG "+ msg_receiver +" :  - \x02"+str(re.sub("\(.*\)","",mens))+"\n")
+                if len(app[i].split("</strong>")[1].split("</span>")[0].strip("\r\n\t")): #dish
+                    dish=self.h.unescape(app[i].split("</strong>")[1].split("</span>")[0].strip("\r\n\t"))
+                    dish=''.join(dish.encode('utf-8'))
+                    dishes.append(dish.split(", ")[:-1])
+                    fruits.append(dish.split(", ")[-1])
+            if len(dishes)>0:
+                print dishes
+                dishes_string=[]
+                for k in range(len(dishes)-2):
+                    for l in range(len(dishes[k])):
+                        if str(re.sub("\(.*\)","",dishes[k][l])).strip(" ") not in dishes_string:
+                            dishes_string.append(str(re.sub("\(.*\)","",dishes[k][l])).strip(" "))
+                self.queue_out.put("PRIVMSG "+ msg_receiver +" :  - \x02\x1DSide dishes\x0F: "+', '.join(dishes_string)+"\n")
+                    
+            print dishes    
+            print fruits
         else:
             self.queue_out.put("PRIVMSG "+ msg_receiver +" :Nothing to eat (anymore) ;[\n")
 

@@ -3,7 +3,7 @@ import thread
 from Queue import *
 import time
 
-class pong(object):
+class TEMPLATE(object):
     def __init__(self):
         self.queue_in=Queue()
         self.queue_out=Queue()

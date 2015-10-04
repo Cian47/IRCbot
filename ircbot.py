@@ -18,7 +18,7 @@ class IRCbot(object):
         self.args=args
         self.server="irc.underworld.no"
         self.port=6667
-        self.nick="Abb0t"
+        self.nick="Abb0to"
         self.channels={}
         #self.ircPassword
         #self.SSL=
@@ -79,10 +79,9 @@ class IRCbot(object):
             
         
         while True:
-            recv = self.sock.recv(2048).strip('\n\r')
+            recv = self.sock.recv(8096).strip('\n\r')
             if len(recv)!=0:
                 print "===\nRECV %d\n==="%len(recv)
-                
                 if recv.split(":")[0]=="PING ":
                     self.pong()
                 elif len(recv.split("\n"))==1:  # single msg = single line ;)
@@ -91,8 +90,16 @@ class IRCbot(object):
                     #we parse it, might need it #TODO make method for this
                     try:
                         _, msg_header, msg_payload = recv.split(":",2)
-                        identification, msg_type, msg_receiver = msg_header.strip(" ").split(" ")
+                        if len(msg_header.strip(" ").split(" "))==3:  # normal msg
+                            identification, msg_type, msg_receiver = msg_header.strip(" ").split(" ")
+                        elif len(msg_header.strip(" ").split(" "))==2:  # join etc of users
+                            identification, msg_type = msg_header.strip(" ").split(" ")
                         sender=identification.split("!")
+                        
+                        # auto op
+                        if msg_type == "JOIN":
+                            if sender[0].find("kfreeman")>=0 and sender[1].find("kiwi")>=0:
+                                self.sock.send("MODE %s +o %s\n"%(msg_payload,sender[0]))
                         
                     except IndexError:
                         print "IndexError"
@@ -137,6 +144,12 @@ class IRCbot(object):
                                 elif msg_type==USERLIST:
                                     try:
                                         self.channels[content[4]].users=cols[2].strip(" ").split(" ")
+                                        nameAt=cols[2].strip(" ").find(self.nick)
+                                        if nameAt>0:
+                                            mode=cols[2][nameAt-1]
+                                            print "USERMODE:",mode,"<<"
+                                            if mode!=" ":
+                                                self.channels[content[4]].usermode=mode
                                     except KeyError:
                                         print "ERROR. USERLIST OF %s BUT NO CHANNELOBJECT!"%(content[4])
                                     pass
@@ -144,6 +157,7 @@ class IRCbot(object):
                                     print "error in nickname, choose another one!"
                                     input(" ... ") # TODO exit
                                 elif msg_type=="MODE": # modechange e.g. oncreate of channel
+                                    self.channels[content[2]].chanmode=content[3]
                                     pass
                                 elif self.args.verbose:
                                     print "UNKOWN MSG_TYPE %s @ %s"%(msg_type,cols)

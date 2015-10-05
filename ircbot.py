@@ -79,7 +79,7 @@ class IRCbot(object):
             
         
         while True:
-            recv = self.sock.recv(8096).strip('\n\r')
+            recv = self.sock.recv(20000).strip('\n\r')
             if len(recv)!=0:
                 print "===\nRECV %d\n==="%len(recv)
                 if recv.split(":")[0]=="PING ":
@@ -135,11 +135,18 @@ class IRCbot(object):
                                 elif msg_type==EOFNAMES:
                                     if GREETONJOIN:
                                         user_list=[]
+                                        op_list=[]
                                         for u in self.channels[content[3]].users:
                                             if u!=self.nick and u[1:]!=self.nick:
                                                 user_list.append(u)
+                                                if u[0]=="@":
+                                                    op_list.append(u)
                                         if len(user_list)>0:
                                             self.sock.send("PRIVMSG "+ content[3] +" :Hello %s\n"%(', '.join(user_list)))
+                                            if len(op_list)>0:
+                                                self.sock.send("PRIVMSG "+ content[3] +" :I like OP rights, please give me some %s O:-)\n"%(', '.join(op_list)))
+                                            
+                                            
                                     pass
                                 elif msg_type==USERLIST:
                                     try:
@@ -157,6 +164,7 @@ class IRCbot(object):
                                     print "error in nickname, choose another one!"
                                     input(" ... ") # TODO exit
                                 elif msg_type=="MODE": # modechange e.g. oncreate of channel
+                                    print content
                                     self.channels[content[2]].chanmode=content[3]
                                     pass
                                 elif self.args.verbose:

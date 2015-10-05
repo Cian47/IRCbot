@@ -22,7 +22,7 @@ class mensa(object):
         self.queue_out=Queue()
         thread.start_new_thread(self.run,())
         self.h=HTMLParser.HTMLParser()
-        self.resttime=5
+        self.resttime=10
         self.lastcmd=0
     
     def run(self):
@@ -91,16 +91,20 @@ class mensa(object):
                 if len(app[i].split("</strong>")[1].split("</span>")[0].strip("\r\n\t")): #dish
                     dish=self.h.unescape(app[i].split("</strong>")[1].split("</span>")[0].strip("\r\n\t"))
                     dish=''.join(dish.encode('utf-8'))
-                    dishes.append(dish.split(", ")[:-1])
-                    fruits.append(dish.split(", ")[-1])
-            if len(dishes)>0:
-                print dishes
-                dishes_string=[]
-                for k in range(len(dishes)-2):
-                    for l in range(len(dishes[k])):
-                        if str(re.sub("\(.*\)","",dishes[k][l])).strip(" ") not in dishes_string:
-                            dishes_string.append(str(re.sub("\(.*\)","",dishes[k][l])).strip(" "))
-                self.queue_out.put("PRIVMSG "+ msg_receiver +" :  - \x02\x1DSide dishes\x0F: "+', '.join(dishes_string)+"\n")
+                    if dish.lower().find("verschiedene salat-")==-1 and dish.lower().find("nur solange der vor")==-1:
+                    #self.queue_out.put("PRIVMSG "+ msg_receiver +" :  - \x02"+str(re.sub("\(.*\)","",dish))+"\n")
+                        self.queue_out.put("PRIVMSG "+ msg_receiver +" :  ===> "+str(re.sub("\(.*\)","",dish))+"\n")
+                    #if dish.lower().find("sauce")==-1 and dish.lower().find("dressing")==-1:
+                    #    dishes.append(dish.split(", ")[:-1])
+                    #fruits.append(dish.split(", ")[-1])
+            #if len(dishes)>0:
+            #    print dishes
+            #    dishes_string=[]
+            #    for k in range(len(dishes)-2):
+            #        for l in range(len(dishes[k])):
+            #            if str(re.sub("\(.*\)","",dishes[k][l])).strip(" ") not in dishes_string:
+            #                dishes_string.append(str(re.sub("\(.*\)","",dishes[k][l])).strip(" "))
+            #    self.queue_out.put("PRIVMSG "+ msg_receiver +" :  - \x02\x1DSide dishes\x0F: "+', '.join(dishes_string)+"\n")
                     
             print dishes    
             print fruits

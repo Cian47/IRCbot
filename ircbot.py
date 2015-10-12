@@ -34,7 +34,8 @@ class IRCbot(object):
             print "Connecting to %s:%d"%(self.server,self.port)
         self.sock.send("USER "+ self.nick +" "+ self.nick +"_ "+ self.nick +"__ :"+self.nick+"\n") # user authentication
         self.sock.send("NICK "+ self.nick +"\n") # here we actually assign the nick to the bot
-        chans=["#bottle123","#bottle3789"]
+        #chans=["#bottle123","#bottle3789"]
+        chans=[]
         for c in chans:
             self.joinChannel(c)
         
@@ -65,7 +66,7 @@ class IRCbot(object):
             
     def recv(self):
         running_mods=[]
-        mods=["pong","mensa","op"]
+        mods=["pong","mensa","op"]#,"quiz"]
         for m in mods:
             exec "import mods.%s"%m
             ## module starting here ##
@@ -199,7 +200,7 @@ class IRCbot(object):
                 if parameters[0]=="JOIN":
                     self.joinChannel(parameters[1])
                 elif parameters[0]=="PART":
-                    self.leaveChannel(parameters[1])
+                    self.leaveChannel(parameters[1])                    
                 else:
                     self.sock.send(d+"\n")
         

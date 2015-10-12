@@ -93,7 +93,7 @@ class mensa(object):
                     dish=''.join(dish.encode('utf-8'))
                     if dish.lower().find("verschiedene salat-")==-1 and dish.lower().find("nur solange der vor")==-1:
                     #self.queue_out.put("PRIVMSG "+ msg_receiver +" :  - \x02"+str(re.sub("\(.*\)","",dish))+"\n")
-                        self.queue_out.put("PRIVMSG "+ msg_receiver +" :  ===> "+str(re.sub("\(.*\)","",dish))+"\n")
+                        self.queue_out.put("PRIVMSG "+ msg_receiver +" :  ===> "+str(re.sub("\(.*\)","",dish).replace(" ,",","))+"\n")
                     #if dish.lower().find("sauce")==-1 and dish.lower().find("dressing")==-1:
                     #    dishes.append(dish.split(", ")[:-1])
                     #fruits.append(dish.split(", ")[-1])

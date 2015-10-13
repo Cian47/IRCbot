@@ -66,7 +66,7 @@ class IRCbot(object):
             
     def recv(self):
         running_mods=[]
-        mods=["pong","mensa","op","curtime"]#,"quiz"]
+        mods=["pong","mensa","op","curtime", "topic"]#,"quiz"]
         for m in mods:
             exec "import mods.%s"%m
             ## module starting here ##

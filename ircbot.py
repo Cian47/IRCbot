@@ -66,7 +66,7 @@ class IRCbot(object):
             
     def recv(self):
         running_mods=[]
-        mods=["pong","mensa","op"]#,"quiz"]
+        mods=["pong","mensa","op","curtime"]#,"quiz"]
         for m in mods:
             exec "import mods.%s"%m
             ## module starting here ##
@@ -91,6 +91,8 @@ class IRCbot(object):
                     #we parse it, might need it #TODO make method for this
                     try:
                         _, msg_header, msg_payload = recv.split(":",2)
+			identification=""
+			msg_type=""
                         if len(msg_header.strip(" ").split(" "))==3:  # normal msg
                             identification, msg_type, msg_receiver = msg_header.strip(" ").split(" ")
                         elif len(msg_header.strip(" ").split(" "))==2:  # join etc of users
@@ -112,10 +114,10 @@ class IRCbot(object):
                     #but we give the whole recv to mods, they may parse on their own                        
                     for mod in running_mods:
                         #print "%d - %d > %d\n%d > %d"%(time.time(),mod.lastcmd,mod.resttime,time.time() - mod.lastcmd,mod.resttime)
-                        if time.time() - mod.lastcmd > mod.resttime:
+                        #if time.time() - mod.lastcmd > mod.resttime:
                             mod.cmd(recv)
-                        else:
-                            mod.queue_out.put("PRIVMSG "+ msg_receiver +" : - I need a total rest of %d seconds - \n"%mod.resttime)
+                        #else:
+                        #    mod.queue_out.put("PRIVMSG "+ msg_receiver +" : - I need a total rest of %d seconds - \n"%mod.resttime)
                 else:
                     for l in recv.split("\n"):
                         l=l.strip("\r")

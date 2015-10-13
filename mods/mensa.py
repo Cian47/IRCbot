@@ -34,40 +34,46 @@ class mensa(object):
                 sender=identification.split("!")
                 
                 if msg_payload[0]=="!" and msg_payload[1:]=="mensa" and msg_receiver[0]=="#":
-                    self.lastcmd=time.time()
-                    self.queue_out.put("PRIVMSG "+ msg_receiver +" :Todays menu:\n")
-                    link="http://www.studentenwerk-goettingen.de/speiseplan.html?selectmensa=Nordmensa"
-                    content=urllib2.urlopen(link).read().strip('\n\r')
-                    
-                    self.to_out(content,msg_receiver)
+                    if time.time() - self.lastcmd > self.resttime:
+                        self.lastcmd=time.time()
+                        self.queue_out.put("PRIVMSG "+ msg_receiver +" :\x02\x1FTodays menu:\n")
+                        link="http://www.studentenwerk-goettingen.de/speiseplan.html?selectmensa=Nordmensa"
+                        content=urllib2.urlopen(link).read().strip('\n\r')
+                        
+                        self.to_out(content,msg_receiver)
+                    else:
+                        self.queue_out.put("PRIVMSG "+ msg_receiver +" : - I need a total rest of %d seconds - \n"%self.resttime)
                         
                                 
                 elif msg_payload[0]=="!" and msg_payload[1:len("mensa")+1]=="mensa" and msg_receiver[0]=="#":
-                    self.lastcmd=time.time()
-                    day = msg_payload.split(" ")[1].lower()
-                    if day == "sunday":
-                        self.queue_out.put("PRIVMSG "+ msg_receiver +" :\x02\x1Fsunday\x0F? are you serious?!\n")
-                    elif day in days:
-                        push = 0
-                        day_index = days.index(msg_payload.split(" ")[1].lower())
-                        if msg_payload.split(" ")[1].lower()=="week":
-                            push = 1
-                            day_index = 7
-                            self.queue_out.put("PRIVMSG "+ msg_receiver +" :\x02\x1F===Next weeks menu===\n")
-                        else:
-                            self.queue_out.put("PRIVMSG "+ msg_receiver +" :\x02\x1F%ss menu:\n"%day)
-                        link="http://www.studentenwerk-goettingen.de/speiseplan.html?selectmensa=Nordmensa&push=%d&day=%d"%(push,day_index)
-                        content=urllib2.urlopen(link).read().strip('\n\r')
-                        ddays=content.split('speise-tblhead')
-                        if len(ddays)==1:  # only one day
-                        
-                            self.to_out(content, msg_receiver)
+                    if time.time() - self.lastcmd > self.resttime:
+                        self.lastcmd=time.time()
+                        day = msg_payload.split(" ")[1].lower()
+                        if day == "sunday":
+                            self.queue_out.put("PRIVMSG "+ msg_receiver +" :\x02\x1Fsunday\x0F? are you serious?!\n")
+                        elif day in days:
+                            push = 0
+                            day_index = days.index(msg_payload.split(" ")[1].lower())
+                            if msg_payload.split(" ")[1].lower()=="week":
+                                push = 1
+                                day_index = 7
+                                self.queue_out.put("PRIVMSG "+ msg_receiver +" :\x02\x1F===Next weeks menu===\n")
+                            else:
+                                self.queue_out.put("PRIVMSG "+ msg_receiver +" :\x02\x1F%ss menu:\n"%day)
+                            link="http://www.studentenwerk-goettingen.de/speiseplan.html?selectmensa=Nordmensa&push=%d&day=%d"%(push,day_index)
+                            content=urllib2.urlopen(link).read().strip('\n\r')
+                            ddays=content.split('speise-tblhead')
+                            if len(ddays)==1:  # only one day
                             
-                        else:  # week?
-                            for i in range(1,len(ddays)):
-                                self.queue_out.put("PRIVMSG "+ msg_receiver +" :%ss menu:\n"%days[i])
+                                self.to_out(content, msg_receiver)
                                 
-                                self.to_out(ddays[i], msg_receiver)
+                            else:  # week?
+                                for i in range(1,len(ddays)):
+                                    self.queue_out.put("PRIVMSG "+ msg_receiver +" :\x02\x1F%ss menu:\n"%days[i])
+                                    
+                                    self.to_out(ddays[i], msg_receiver)
+                    else:
+                        self.queue_out.put("PRIVMSG "+ msg_receiver +" : - I need a total rest of %d seconds - \n"%self.resttime)
                     
                 
             except IndexError:

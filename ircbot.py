@@ -66,7 +66,7 @@ class IRCbot(object):
             
     def recv(self):
         running_mods=[]
-        mods=["pong","mensa","op","curtime", "topic"]#,"quiz"]
+        mods=["pong","mensa","op","curtime", "topic", "log"]#,"quiz"]
         for m in mods:
             exec "import mods.%s"%m
             ## module starting here ##
@@ -91,8 +91,8 @@ class IRCbot(object):
                     #we parse it, might need it #TODO make method for this
                     try:
                         _, msg_header, msg_payload = recv.split(":",2)
-			identification=""
-			msg_type=""
+                        identification=""
+                        msg_type=""
                         if len(msg_header.strip(" ").split(" "))==3:  # normal msg
                             identification, msg_type, msg_receiver = msg_header.strip(" ").split(" ")
                         elif len(msg_header.strip(" ").split(" "))==2:  # join etc of users

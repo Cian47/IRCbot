@@ -93,13 +93,13 @@ class mensa(object):
                     mens=self.h.unescape(app[i].split("<strong>")[1].split("</strong>")[0])
                     mens=''.join(mens.encode('utf-8'))
                     #print mens
-                    self.queue_out.put("PRIVMSG "+ msg_receiver +" :  - \x02"+str(re.sub("\(.*\)","",mens))+"\n")
+                    self.queue_out.put("PRIVMSG "+ msg_receiver +" :  - \x02"+str(re.sub("\(.*\)","",mens)).strip(" ")+"\n")
                 if len(app[i].split("</strong>")[1].split("</span>")[0].strip("\r\n\t")): #dish
                     dish=self.h.unescape(app[i].split("</strong>")[1].split("</span>")[0].strip("\r\n\t"))
                     dish=''.join(dish.encode('utf-8'))
                     if dish.lower().find("verschiedene salat-")==-1 and dish.lower().find("nur solange der vor")==-1:
                     #self.queue_out.put("PRIVMSG "+ msg_receiver +" :  - \x02"+str(re.sub("\(.*\)","",dish))+"\n")
-                        self.queue_out.put("PRIVMSG "+ msg_receiver +" :  ===> "+str(re.sub("\(.*\)","",dish).replace(" ,",","))+"\n")
+                        self.queue_out.put("PRIVMSG "+ msg_receiver +" :  ===> "+str(re.sub("\(.*\)","",dish).replace(" ,",",")).strip(" ")+"\n")
                     #if dish.lower().find("sauce")==-1 and dish.lower().find("dressing")==-1:
                     #    dishes.append(dish.split(", ")[:-1])
                     #fruits.append(dish.split(", ")[-1])

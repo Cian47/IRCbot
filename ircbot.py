@@ -11,12 +11,13 @@ import sys  # read input for ownSend
 TOPIC="332"
 USERLIST="353"
 EOFNAMES="366"
-GREETONJOIN=True
+GREETONJOIN=2
 
 class IRCbot(object):         
     def __init__(self, args):
         self.args=args
-        self.server="irc.underworld.no"
+        #self.server="irc.underworld.no"
+        self.server="efnet.port80.se"
         #self.server="kornbluth.freenode.net"
         self.port=6667
         self.nick="Abb0t"
@@ -146,9 +147,13 @@ class IRCbot(object):
                                                 if u[0]=="@":
                                                     op_list.append(u)
                                         if len(user_list)>0:
-                                            self.sock.send("PRIVMSG "+ content[3] +" :Hello %s\n"%(', '.join(user_list)))
-                                            if len(op_list)>0:
-                                                self.sock.send("PRIVMSG "+ content[3] +" :I like OP rights, please give me some %s O:-)\n"%(', '.join(op_list)))
+                                            if GREETONJOIN==1:  # greet everyone and ask for op
+                                                self.sock.send("PRIVMSG "+ content[3] +" :Hello %s\n"%(', '.join(user_list)))
+                                                if len(op_list)>0:
+                                                    self.sock.send("PRIVMSG "+ content[3] +" :I like OP rights, please give me some %s O:-)\n"%(', '.join(op_list)))
+                                            elif GREETONJOIN==2:  # just say hi
+                                                self.sock.send("PRIVMSG "+ content[3] +" :Hello guys ;]\n")#(mods: %s)\n"%(', '.join(mods)))
+                                        
                                             
                                             
                                     pass

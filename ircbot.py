@@ -17,6 +17,7 @@ class IRCbot(object):
     def __init__(self, args):
         self.args=args
         self.server="irc.underworld.no"
+        #self.server="kornbluth.freenode.net"
         self.port=6667
         self.nick="Abb0t"
         self.channels={}
@@ -199,11 +200,12 @@ class IRCbot(object):
                 d=d.strip("\n")
                 parameters=filter(None,d.split(" "))
                 print parameters
-                if parameters[0]=="JOIN":
-                    self.joinChannel(parameters[1])
-                elif parameters[0]=="PART":
-                    self.leaveChannel(parameters[1])                    
-                else:
-                    self.sock.send(d+"\n")
+                if len(parameters)>0:
+                    if parameters[0]=="JOIN":
+                        self.joinChannel(parameters[1])
+                    elif parameters[0]=="PART":
+                        self.leaveChannel(parameters[1])                    
+                    else:
+                        self.sock.send(d+"\n")
         
     

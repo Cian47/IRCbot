@@ -57,7 +57,7 @@ class mensa(object):
                             if msg_payload.split(" ")[1].lower()=="week":
                                 push = 1
                                 day_index = 7
-                                self.queue_out.put("PRIVMSG "+ msg_receiver +" :\x02\x1F===Next weeks menu===\n")
+                                self.queue_out.put("PRIVMSG "+ sender[0] +" :\x02\x1F===Next weeks menu===\n")
                             else:
                                 self.queue_out.put("PRIVMSG "+ msg_receiver +" :\x02\x1F%ss menu:\n"%day)
                             link="http://www.studentenwerk-goettingen.de/speiseplan.html?selectmensa=Nordmensa&push=%d&day=%d"%(push,day_index)
@@ -69,9 +69,9 @@ class mensa(object):
                                 
                             else:  # week?
                                 for i in range(1,len(ddays)):
-                                    self.queue_out.put("PRIVMSG "+ msg_receiver +" :\x02\x1F%ss menu:\n"%days[i])
+                                    self.queue_out.put("PRIVMSG "+ sender[0] +" :\x02\x1F%ss menu:\n"%days[i])
                                     
-                                    self.to_out(ddays[i], msg_receiver)
+                                    self.to_out(ddays[i], sender[0])
                     else:
                         self.queue_out.put("PRIVMSG "+ msg_receiver +" : - I need a total rest of %d seconds - \n"%self.resttime)
                     

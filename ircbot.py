@@ -17,8 +17,10 @@ class IRCbot(object):
     def __init__(self, args):
         self.args=args
         #self.server="irc.underworld.no"
-        self.server="efnet.port80.se"
-        #self.server="kornbluth.freenode.net"
+        if args.server==1:
+            self.server="efnet.port80.se"
+        elif args.server==2:
+            self.server="kornbluth.freenode.net"
         self.port=6667
         self.nick="Abb0t"
         self.channels={}
@@ -68,7 +70,7 @@ class IRCbot(object):
             
     def recv(self):
         running_mods=[]
-        mods=["pong","mensa","op","curtime", "topic", "log", "ifi"]#,"quiz"]
+        mods=["pong","mensa","op","curtime", "topic", "log", "ifi", "abb0t"]#,"quiz"]
         for m in mods:
             exec "import mods.%s"%m
             ## module starting here ##

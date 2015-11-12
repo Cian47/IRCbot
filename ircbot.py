@@ -11,18 +11,32 @@ import sys  # read input for ownSend
 TOPIC="332"
 USERLIST="353"
 EOFNAMES="366"
-GREETONJOIN=2
+GREETONJOIN=0#2
+
+#    irc.Qeast.net:6667
+#    irc.inet.tele.dk:6667
+#    irc.efnet.org:6667
+#    irc.efnet.pl:6667
+#    irc.efnet.ch:6667
+#    irc.efnet.no:6667
+#    efnet.cs.hut.fi:6667
+#    efnet.port80.se:6667
+#    irc.du.se:6667
+#    irc.pte.hu:6667
+#    irc.swepipe.se:6667
+
 
 class IRCbot(object):         
     def __init__(self, args):
         self.args=args
         #self.server="irc.underworld.no"
         if args.server==1:
-            self.server="efnet.port80.se"
+            #self.server="efnet.port80.se"
+            self.server="irc.Qeast.net"
         elif args.server==2:
             self.server="kornbluth.freenode.net"
         self.port=6667
-        self.nick="Abb0t"
+        self.nick=self.args.name
         self.channels={}
         #self.ircPassword
         #self.SSL=
@@ -65,12 +79,15 @@ class IRCbot(object):
         for l in msgList:
             message(self, to, l)
             
-    def pong(self):
-        self.sock.send("PONG :pingis\n")  
+    def pong(self,m):
+        self.sock.send("PONG :{}\n".format(m))  
             
     def recv(self):
         running_mods=[]
-        mods=["pong","mensa","op","curtime", "topic", "log", "ifi", "abb0t"]#,"quiz"]
+        if self.args.server==1:
+            mods=["pong","mensa","op","curtime", "topic", "log", "ifi", "abb0t"]#,"quiz"]
+        elif self.args.server==2:
+            mods=["pong","mensa","log","abb0t"]#,"quiz"]
         for m in mods:
             exec "import mods.%s"%m
             ## module starting here ##
@@ -84,11 +101,13 @@ class IRCbot(object):
             
         
         while True:
-            recv = self.sock.recv(20000).strip('\n\r')
+            recv = self.sock.recv(50000).strip('\n\r')
             if len(recv)!=0:
                 print "===\nRECV %d\n==="%len(recv)
+                if self.args.verbose:
+                    print recv
                 if recv.split(":")[0]=="PING ":
-                    self.pong()
+                    self.pong(recv.split(":")[1])
                 elif len(recv.split("\n"))==1:  # single msg = single line ;)
                     print recv
                     
@@ -168,6 +187,8 @@ class IRCbot(object):
                                             print "USERMODE:",mode,"<<"
                                             if mode!=" ":
                                                 self.channels[content[4]].usermode=mode
+                                    except IndexError:
+                                        print "..."
                                     except KeyError:
                                         print "ERROR. USERLIST OF %s BUT NO CHANNELOBJECT!"%(content[4])
                                     pass

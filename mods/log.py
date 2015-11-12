@@ -25,8 +25,8 @@ class log(object):
                 
                 if msg_payload and msg_receiver[0]=="#":
                     with gzip.open("msglog.gz","a+") as log:
-                        print "logged:",msg_payload
-                        log.write(msg_payload+"\n")
+                        #print "logged:",msg_payload
+                        log.write(str(time.time())+";"+sender[0]+";"+msg_payload+"\n")
 
                     
                 

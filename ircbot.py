@@ -91,7 +91,10 @@ class IRCbot(object):
         for m in mods:
             exec "import mods.%s"%m
             ## module starting here ##
-            exec "mod=mods.%s.%s()"%(m,m)
+            additional=""
+            if m=="abb0t":
+                additional="\"%s\""%self.nick
+            exec "mod=mods.%s.%s(%s)"%(m,m,additional)
             running_mods.append(mod)
             thread.start_new_thread(self.modHandling,(mod,))
             

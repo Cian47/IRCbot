@@ -61,11 +61,12 @@ class ifi(object):
                     elif i==1:
                         class_say=classes.split("<tr")[j].split("</td>")[i].split("<td")[1].split(">")[1].split("<")[0].replace("<br","").strip("\t\n ")
                         spaces_umlaute=len(class_say)-len(class_say.decode("utf-8"))
-                        leng="%d"%(30+spaces_umlaute)
+                        leng="%d"%(50+spaces_umlaute)
                         leng="%-"+leng+"s | "
                         to_say+=leng%classes.split("<tr")[j].split("</td>")[i].split("<td")[1].split(">")[1].split("<")[0].replace("<br","").strip("\t\n ") #umlaute
                     elif i==2:
-                        to_say+="%-6s | "%classes.split("<tr")[j].split("</td>")[i].split("<td")[1].split(">")[1].split("<")[0].replace("<br","").strip("\t\n ")
+                        pass
+                        #to_say+="%-6s | "%classes.split("<tr")[j].split("</td>")[i].split("<td")[1].split(">")[1].split("<")[0].replace("<br","").strip("\t\n ")
                     elif i==3:
                         to_say+="%-20s"%classes.split("<tr")[j].split("</td>")[i].split("<td")[1].split(">")[1].split("<")[0].replace("<br","").strip("\t\n ")
             else:

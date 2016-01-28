@@ -1,5 +1,6 @@
 import socket
 import thread
+import signal 
 
 #mystuff
 from channel import *
@@ -31,10 +32,13 @@ class IRCbot(object):
         self.args=args
         #self.server="irc.underworld.no"
         if args.server==1:
-            #self.server="efnet.port80.se"
-            self.server="irc.Qeast.net"
+            self.server="efnet.port80.se"
+            #self.server="irc.Qeast.net"
         elif args.server==2:
-            self.server="kornbluth.freenode.net"
+            #self.server="wilhelm.freenode.net"
+            #self.server="kornbluth.freenode.net"
+            self.server="verne.freenode.net"
+            #self.server="card.freenode.net"
         self.port=6667
         self.nick=self.args.name
         self.channels={}
@@ -82,12 +86,16 @@ class IRCbot(object):
     def pong(self,m):
         self.sock.send("PONG :{}\n".format(m))  
             
+    #def signal_handler(self, signum, frame):
+    #    raise Exception("Timed out!")
+        
     def recv(self):
+        #signal.signal(signal.SIGALRM, self.signal_handler)
         running_mods=[]
         if self.args.server==1:
-            mods=["pong","mensa","op","curtime", "topic", "log", "ifi", "abb0t"]#,"quiz"]
+            mods=["pong","mensa","op","curtime", "topic", "log", "ifi", "abb0t", "benis"]#, "bf"]#,"quiz"]
         elif self.args.server==2:
-            mods=["pong","mensa","log","abb0t"]#,"quiz"]
+            mods=["pong","mensa","log","abb0t"]#, "bf"]#,"quiz"]
         for m in mods:
             exec "import mods.%s"%m
             ## module starting here ##

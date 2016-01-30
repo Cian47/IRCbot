@@ -45,12 +45,12 @@ class IRCbot(object):
         #self.ircPassword
         #self.SSL=
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.connect()
+        self.connect([])
         self.recv()
         #thread.start_new_thread(self.recvThread,())
         
         
-    def connect(self):
+    def connect(self,chans):
         self.sock.connect((self.server, self.port))
         if self.args.verbose:
             print "Connecting to %s:%d"%(self.server,self.port)
@@ -215,7 +215,11 @@ class IRCbot(object):
                             
             else:
                 print "disconnect ???"
-                input(" ... ")
+                chans=[]
+                for k,d in self.channels.iteritems():
+                    chans.append(k) # add the key => channel name
+                self.connect(chans)
+                #input(" ... ")
                 
     def modHandling(self,mod):
         sent = 0

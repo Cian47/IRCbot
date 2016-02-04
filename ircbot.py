@@ -93,7 +93,7 @@ class IRCbot(object):
         #signal.signal(signal.SIGALRM, self.signal_handler)
         running_mods=[]
         if self.args.server==1:
-            mods=["pong","mensa","op","curtime", "topic", "log", "ifi", "abb0t", "benis"]#, "bf"]#,"quiz"]
+            mods=["pong","mensa","op","curtime", "topic", "log", "ifi", "abb0t"]#, "bf"]#,"quiz"]
         elif self.args.server==2:
             mods=["pong","mensa","log","abb0t"]#, "bf"]#,"quiz"]
         for m in mods:

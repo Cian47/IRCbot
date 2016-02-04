@@ -3,7 +3,6 @@ from ircbot import *
 
 def main(args):
     bot = IRCbot(args)
-    pass
 
 
 if __name__ == "__main__":
